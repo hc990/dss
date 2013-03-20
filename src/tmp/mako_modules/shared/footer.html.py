@@ -4,12 +4,12 @@ UNDEFINED = runtime.UNDEFINED
 __M_dict_builtin = dict
 __M_locals_builtin = locals
 _magic_number = 8
-_modified_time = 1355724449.218
+_modified_time = 1348625078.218
 _enable_loop = True
-_template_filename = u'E:\\workspacePY\\sod\\src/views/shared/footer.html'
+_template_filename = u'E:\\workspacePY\\let\\src/views/shared/footer.html'
 _template_uri = u'/shared/footer.html'
 _source_encoding = 'utf-8'
-from views.filters import Cycler,Filters
+from views.filters import Filters, Cycler
 _exports = []
 
 

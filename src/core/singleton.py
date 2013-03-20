@@ -1,7 +1,7 @@
 '''
 Created on 2012/2/23
 
-@author: hwangchong
+@author: ishida
 '''
 class Singleton(object):
     
@@ -10,4 +10,9 @@ class Singleton(object):
         if not cls._instance:
             cls._instance = super(Singleton, cls).__new__(
                                 cls, *args, **kwargs)
-        return cls._instance
+        return cls._instance  
+
+
+
+
+

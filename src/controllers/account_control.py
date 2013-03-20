@@ -1,19 +1,19 @@
-# -*- coding: utf-8 -*-
 from core.basehandler import BaseHandler
 from db.mongo import Mongo
 from models.user import User
 import datetime, hashlib 
 from tornado.web import authenticated
 from views.decorators import route  
+
 from tornado.web import asynchronous
 
 @route('/')
 class IndexHandler(BaseHandler):
-    @asynchronous  
     def get(self):
         #template context variables go in here
         template_values = {}  
         self.render_template('/account/login.html', **template_values)
+
 
 @route('/logout')     
 class LogoutHandler(BaseHandler):
@@ -21,24 +21,14 @@ class LogoutHandler(BaseHandler):
         self.session['username'] = None
         self.session.destroy()
         #kill the session.
-        self.clear_all_cookies()
         self.redirect("/")
 
 @route('/login')
 class LoginHandler(BaseHandler):
     def get(self):
-        if not self.get_secure_cookie('username'):
-            username = self.get_secure_cookie('username')
-            if username:
-                user = User.lookup(username)
-                if user:
-                    self.session['username'] = user.username
-                    self.session['locale'] = user.profile.locale
-            self.redirect("/")    
-        else:
-            template_values = {}
-            template_values['next'] = self.get_argument('next', '/')
-            self.render_template('/account/login.html', **template_values)
+        template_values = {}
+        template_values['next'] = self.get_argument('next', '/')
+        self.render_template('/account/login.html', **template_values)
 
     def post(self):
         username = self.get_argument("username", None)
@@ -49,7 +39,7 @@ class LoginHandler(BaseHandler):
             self.session['flash'] = self.flash
             self.redirect("/login")
             return
-        pw = hashlib.sha1(password).hexdigest()
+        pw = hashlib.sha1(password).hexdigest()  
         username = User.normalize(username)
         user = User.lookup(username)
         
@@ -73,16 +63,14 @@ class LoginHandler(BaseHandler):
                                                     })        
         #add to the session.
         self.session['username'] = user._id
+        #check keep_logged_in
+#        print self.get_arguments("keep_logged_in", False)
 #        if self.get_argument("keep_logged_in", False) == "on" :
-        self.session['keep_logged_in'] = True    
-        self.flash.notice = "Welcome, %s" % user._id  
+        self.session['keep_logged_in'] = True
         self.set_current_user(user)
-        if user['roletype']==2:  
-            self.redirect(u'/manage') 
-        elif user['roletype']==3:
-            self.redirect("/product")
-        else:  
-            self.redirect("/signup")
+        self.flash.notice = "Welcome, %s" % user._id
+        forwardUrl = self.get_argument('next', '/')
+        self.redirect(forwardUrl)  
            
 @route('/asy_login')
 class AsyLoginHandler(BaseHandler):
@@ -116,9 +104,7 @@ class AsyLoginHandler(BaseHandler):
         #check keep_logged_in
         if self.get_argument("keep_logged_in", False) == "on" :
             self.session['keep_logged_in'] = True
-            
         self.set_current_user(user)
-#        self.session['current_user']= user._id
         self.flash.notice = "Welcome, %s" % user._id
         self.write(username)
         self.finish("finished")
@@ -149,16 +135,14 @@ class PasswordChanger(BaseHandler):
         if self.get_current_user()['password'] != pw:  
             # do something
             self.flash.error = "Password not valid, please try again"
-            template_values = {}
-            self.render_template('/account/pwdchange.html', **template_values)
+            self.redirect("/settings")
             return
           
         newPw = self.get_argument('new_pw')
         newPw2 = self.get_argument('new_pw_again')
-        if newPw != newPw2 :  
+        if newPw != newPw2 :
             self.flash.error = "Passwords do not match, please try again"
-            template_values = {}
-            self.render_template('/account/pwdchange.html', **template_values)
+            self.redirect("/settings")
             return
         
         password = hashlib.sha1(newPw).hexdigest()
@@ -166,10 +150,10 @@ class PasswordChanger(BaseHandler):
                                                     '$set' : {'password': password}
                                                     })       
         self.flash.success = "Successfully updated password"
-        self.redirect('/')
+        self.redirect('/login')
         
 @route('/signup')
-class SignupHandler(BaseHandler):  
+class SignupHandler(BaseHandler):
     
 #    @authenticated
 #    @role_required('/signup')
@@ -184,6 +168,7 @@ class SignupHandler(BaseHandler):
         username = self.get_argument("username", None)
         password = self.get_argument("password", None)
         roletype = self.get_argument("roletype", None)
+
         if not username or not password:
             # do something
             self.flash.error = "You must enter a username and password to proceed. Please try again."
@@ -197,8 +182,6 @@ class SignupHandler(BaseHandler):
         
         user = User.instance(username, password, int(roletype))
         Mongo.db.ui['users'].insert(user)
-        self.flash.info = "Successfully created account, please let them try."
-        if roletype == '2':
-            self.redirect("/get_users")  
-        elif roletype == '1':  
-            self.redirect("/get_admin")
+        self.flash.info = "Successfully created your account, please log in."
+        self.redirect("/login")        
+

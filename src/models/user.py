@@ -1,16 +1,16 @@
-# -*- coding: utf-8 -*-
 '''
 Created on 2012/2/22
 
 @author: ishida
 '''
 
-from mongokit import Document
+from mongokit import *
 import datetime
-import hashlib, re   
-from db.mongo import Mongo  
-import uuid 
-
+import hashlib, hmac, base64, re   
+from db.mongo import Mongo
+from tornado import options
+import json  
+    
 '''
 normalizes a username or email address
 '''
@@ -18,13 +18,13 @@ def normalize(username):
     if not username :
         return None
     #allow legal email address
-#    name = username.strip().lower()
-#    name = re.sub(r'[^a-z0-9\\.\\@_\\-~#]+', '', username)
-#    name = re.sub('\\s+', '_', name)
-#    #don't allow $ and . because they screw up the db.
-#    name = name.replace(".", "")
-#    name = name.replace("$", "")
-    return username;
+    name = username.strip().lower()
+    name = re.sub(r'[^a-z0-9\\.\\@_\\-~#]+', '', name)
+    name = re.sub('\\s+', '_', name)
+    #don't allow $ and . because they screw up the db.
+    name = name.replace(".", "")
+    name = name.replace("$", "")
+    return name;
 
 @Mongo.db.connection.register
 class User(Document):
@@ -67,24 +67,9 @@ class User(Document):
         username = normalize(username)
         user = User()    
         roles = [role[0] for role in route.get_routes()]
-        if roletype == 1:
-            roles.remove('/manage')
-            roles.remove('/custorm_add')
-            roles.remove('/custorm_mod')
-            roles.remove('/product')
-        elif roletype == 2:
-            roles.remove('/signup')
-            roles.remove('/product')
-        elif roletype == 3:
-            roles.remove('/signup')
-            roles.remove('/manage')
-            roles.remove('/custorm_add')
-            roles.remove('/custorm_mod')
-        else :
-            print 'there is something wrong'
         user.roletype = roletype
         user.roles = roles
-        user.status= 0
+        user.status=0
         user['_id'] = username
         user.password = hashlib.sha1(password).hexdigest()
         user.created_at = datetime.datetime.now()
@@ -134,7 +119,4 @@ class User(Document):
             return False
         return self.suspended_at < datetime.datetime.utcnow()
     
-    @staticmethod  
-    def updateUser(_id, status):
-        Mongo.db.ui['users'].update({"_id":_id}, {'$set':{'status':status}})
 

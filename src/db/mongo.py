@@ -32,7 +32,7 @@ class Mongo(Singleton):
     
     '''
         Useage:
-        from toolstar.db.mongo import Mongo
+        from whirlwind.db.mongo import Mongo
         Mongo.create(host='host.com', port='23423', username='mongouser', password='password')
     '''
     @staticmethod

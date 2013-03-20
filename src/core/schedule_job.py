@@ -3,43 +3,60 @@ Created on 2012-11-8
 
 @author: huangchong
 '''
+from config import options_setup
+from core.scheduler import JzScheduler
+from db.mongo import Mongo
+from pysnmp.entity.rfc3413.oneliner import cmdgen
+from tornado.options import define, options, options
 import datetime
-from client.rpc_client import TelnetRpcClient
-from apscheduler.scheduler import Scheduler
+import json
 import json
 import logging
-from tornado.options import options  
-#from models.order import Order  
-from core.bootstrap import Bootstrap
-
+import string
+import uuid
 '''  
 30min start the job
 '''
- 
-
-
-@Bootstrap.schedudler.cron_schedule(second=1)
-def set_bandwidth_job():
-    print " [x] Requesting"
-#    rpc = TelnetRpcClient('192.168.0.2')
-#    print " [x] Requesting from rpc"
-#    response = rpc.call(json.dumps({'switch_name':'TelnetManage3560', 
-#                            "port_name":"e1/0/1", "host":"211.147.71.41", "bandwidth":2}))
-#    print " [.] Got %r" % (response,)
-    print 'set_bandwidth_job start at ', datetime.datetime.now()
-
-
-
-
-
-#@Bootstrap.schedudler.cron_schedule(minute='00,30')
-#def setback_bandwidth_job():
-#    rpc = TelnetRpcClient('211.147.71.42')
-#    print " [x] Requesting from rpc"
-#    response = rpc.call(json.dumps({'switch_name':'TelnetManage3560', 
-#                            "port_name":"e1/0/1", "host":"211.147.71.41", "bandwidth":2}))
-#    print " [.] Got %r" % (response,)
-#    print 'setback_bandwidth_job start at ', datetime.datetime.now()
-
     
+def job_function():    
+    print " [x] Requesting"
+    print 'set_bandwidth_job start at ', datetime.datetime.now()
+    
+    
+def job_bandwidth(id):
+    values = []
+    logging.basicConfig() 
+    cg = cmdgen.CommandGenerator() 
+    comm_data = cmdgen.CommunityData('jztec', 'jztec',) 
+    transport = cmdgen.UdpTransportTarget(('192.168.11.253', 161))
+    variables = (1, 3, 6, 1, 2, 1, 2, 2, 1, 10) 
+    errIndication, errStatus, errIndex, results = cg.nextCmd(comm_data, transport, variables)  
+    for result in results:
+        for name,val in result:
+            a = name[10:]
+            print a 
+            c = {'port':str(a),'created_at':None,'value':val.prettyPrint()}
+            print c
+            Mongo.db.ui['bandwidths'].update({"_id":id}, {'$push':{'values':[{'port':a,'created_at':datetime.datetime.now(),'value':val.prettyPrint()}]}} )   
+             
+#     variables = (1, 3, 6, 1, 2, 1, 2, 2, 1, 16) 
+#     errIndication, errStatus, errIndex, results = cg.nextCmd(comm_data, transport, variables) 
+#     for result in results:
+#         for name,val in result:
+#             ports.append(name[10:])
+#             values.append(int(val.prettyPrint()))
+     
+   
+     
+    
+def dss_jobs(id):
+    Mongo.create(host='localhost', port=27017)
+    id = Mongo.db.ui['bandwidths'].insert({'ip':'192.168.11.253'})
+    sche = JzScheduler()
+    sche.add_interval_job(job_bandwidth,seconds=5,args=[id])
+    sche.start()
 
+
+
+if __name__ == '__main__':
+    dss_jobs(id)

@@ -1,0 +1,1 @@
+db.students.update({name: "joe"},{$push:{scores:{$each:[90,92,85]}}})

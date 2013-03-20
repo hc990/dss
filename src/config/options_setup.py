@@ -42,10 +42,3 @@ define("redis_port", default=6379, type=int)
 define("redis_db", default=None, type=int)
 
 define("memcache_host", default=None)
-
-define("service_ip",default="192.168.0.2")
-#define the telnet password saved diractory
-define("telnet_key_dir", default='/home/junzhong/keys')
-
-define("jz_keys", default="jz_keys")
-

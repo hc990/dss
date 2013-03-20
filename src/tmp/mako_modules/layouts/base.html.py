@@ -4,12 +4,12 @@ UNDEFINED = runtime.UNDEFINED
 __M_dict_builtin = dict
 __M_locals_builtin = locals
 _magic_number = 8
-_modified_time = 1356321200.5
+_modified_time = 1363748806.474735
 _enable_loop = True
-_template_filename = u'E:\\workspacePY\\sod\\src/views/layouts/base.html'
+_template_filename = u'/home/huangchong/workspace/dashbroad/src/views/layouts/base.html'
 _template_uri = u'/layouts/base.html'
 _source_encoding = 'utf-8'
-from views.filters import Cycler,Filters
+from views.filters import Filters, Cycler
 _exports = ['scripts', 'page_title', 'head_tags']
 
 
