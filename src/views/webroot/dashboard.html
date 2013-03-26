@@ -3,168 +3,11 @@
 <%def name="body()">
 <%! 
 import time
-
-
-
 %>
-	    
-    
-
-<div class="quick-actions">
-				<a href="#quickpost" class="modal">
-					<span class="glyph new"></span>
-					參數修改
-  </a>
-
-				<a href="#">
-					<span class="glyph export"></span>
-					導出excel
-  </a>
-
-				<a href="#" class="disabled">
-					<span class="glyph switch"></span>  
-					Turn off
-  </a>
-			</div>
-
 			<div class="box column-left">
-				<div class="box-header">
-					<span class="glyph chart"></span>
-					<h1>用量統計</h1>
-				</div>
-
-				<ul class="statistics">
-					<li>
-						<a href="#">
-							<span>1.3k</span>
-							New visitors
-      </a>
-					</li>
-					<li>
-						<a href="#">
-							<span>23</span>
-							Returning visitors
-      </a>
-					</li>
-					<li>
-						<a href="#">
-							<span>16%</span>
-							Bounce rate
-      </a>
-					</li>
-					<li>
-						<a href="#">
-							<span>7%</span>
-							Increase since last month
-      </a>
-					</li>
-				</ul>
-
-				<div class="action_bar">
-					<!-- <a href="#" class="button small"><span class="glyph export"></span>Export data</a>
-					<a href="#" class="button small"><span class="glyph print"></span>Print statistics</a> -->
-				</div>
-			</div>
-
-			<div class="box column-right">
-				<div class="box-header">
-					<h1>網路狀況</h1>
-				</div>
-
-				<table>
-					<tbody>
-						<tr>
-							<td>Webhosting:</td>
-							<td><strong>VPS Server 1</strong></td>
-						</tr>
-						<tr>
-							<td>Available space:</td>
-							<td>239/1000 GB used</td>
-						</tr>
-						<tr>
-							<td>MySQL databases:</td>
-							<td class="red">5/5 used</td>
-						</tr>
-						<tr>
-							<td>Email accounts:</td>
-							<td class="red">25/25 used</td>
-						</tr>
-						<tr>
-							<td>Ruby version:</td>
-							<td>1.9.3</td>
-						</tr>
-						<tr>
-							<td>Rails version:</td>
-							<td>3.0.1</td>
-						</tr>
-					</tbody>
-				</table>
-
-				<div class="action_bar">
-					<!-- <a href="#" class="button blue"><span class="glyph plus2"></span>Upgrade plan</a>
-					<a href="#">Cancel subscription</a> -->
-				</div>
-			</div>
-
-
-
-
-
-			<div class="box column-left">
-				<div class="box-header">
-					<h1>Bar Chart</h1>
-				</div>
-
-				<div class="box-content">
-					<div id="jflot" style="width: 100%; height: 300px">
-					</div>
-				</div>
-
-			</div>
-			<script type="text/javascript">
-				var dataArray = [];
-
-				for (var i = 0; i < 13; i++) {
-					dataArray.push([2000 + i, Math.random() * 11]);
-				}
-
-				var data = [{
-					label: "Yearly increase",
-					data: dataArray
-				}];
-
-				var options = {
-					legend: {
-						show: true
-					},
-					bars: {
-						show: true
-					},
-					grid: {
-						borderWidth: 0
-					},
-					xaxis: {
-						tickSize: 1
-					},
-					yaxis: {
-						tickSize: 1,
-						tickDecimals: 0
-					}
-				};
-
-				$('document').ready(function () {
-					$.plot($("#jflot"), data, options);
-				});
-			</script>
-
-
-
-
-			<div class="box column-right">
 				<div class="box-header">
 					<h1>Line Chart</h1>
 				</div>
-
 				<div class="box-content">
 					<div id="jflot2" style="width: 100%; height: 300px">
 					</div>
@@ -173,18 +16,13 @@ import time
 			</div>
 			<script type="text/javascript">
 				var dataArray2 = [];
-
-
-
-
-
-
-				for (var i = 0; i < 13; i++) {
-					dataArray2.push([2000 + i,  11]);
+				var times = ${times}
+				var values = ${values} 
+				for (var i = 0; i < 5 ; i++) {  
+					dataArray2.push([times[i],values[i]]);
 				}
-
 				var data2 = [{
-					label: "Yearly increase",
+					label: "流量分时数据 端口:"+${port},
 					data: dataArray2
 				}];
 

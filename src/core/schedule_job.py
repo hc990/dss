@@ -22,7 +22,7 @@ def job_function():
     print '[x] Requesting'
     print 'set_bandwidth_job start at ', datetime.datetime.now()
         
-def job_bandwidth(id):
+def job_bandwidth():
     created_at = datetime.datetime.now()
     values = []
     logging.basicConfig()
@@ -42,10 +42,10 @@ def job_bandwidth(id):
         for name,val in result:
             Mongo.db.ui['bandwidths'].insert({'ip':'192.168.11.253','port': str(name[10:]),'type':1,'created_at':created_at,"value":int(val.prettyPrint())})
 
-def dss_jobs(id):
+def dss_jobs():  
     sche = JzScheduler()
-    sche.add_interval_job(job_bandwidth,seconds=5,args=[id])
+    sche.add_interval_job(job_bandwidth,seconds=5)
     sche.start()
 
 if __name__ == '__main__':
-    dss_jobs(id)
+    dss_jobs()

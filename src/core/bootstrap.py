@@ -4,7 +4,7 @@ import sys, os
 from core.log import Log
 import datetime
 from db.mongo import Mongo
-
+from core.schedule_job import  dss_jobs
 
 
 class Bootstrap():
@@ -64,6 +64,7 @@ class Bootstrap():
         #bind server to port
         http_server.listen(options.port)
             
+        dss_jobs()
         
         #log our start message
         Log.info("Ready and listening")
